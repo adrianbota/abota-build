@@ -8,69 +8,79 @@ const assign = require('lodash.assign');
 const forEach = require('lodash.foreach');
 const idxTmpl = require('index-template');
 const browserSync = require('browser-sync');
+const merge = require('merge-stream');
 
 module.exports = function (options) {
-  var jsMap = assign({ 'main.js': 'script.js' }, options.js);
-  var cssMap = assign({ 'main.less': 'style.css' }, options.css);
-  var htmlMap = assign({ 'index.html': 'index.html' }, options.html);
-  var distSrc = [].concat(options.dist || []);
+  options = (options || {});
 
-  var miscSrc = [
+  const jsMap = assign({ 'main.js': 'script.js' }, options.js);
+  const cssMap = assign({ 'main.less': 'style.css' }, options.css);
+  const htmlMap = assign({ 'index.html': 'index.html' }, options.html);
+  const distSrc = [].concat(options.dist || []);
+
+  const miscSrc = [
     'src/robots.txt',
     'src/favicon.*',
     'src/CNAME'
   ].concat(options.misc || []);
 
-  var distTask = function () {
-    gulp.src(distSrc).pipe(gulp.dest('dist'));
+  const distTask = function () {
+    return gulp.src(distSrc).pipe(gulp.dest('dist'));
   };
 
   gulp.task('clean', function () {
-    del.sync([
+    return del.sync([
       'dist/**/*',
       'docs/**/*'
     ]);
   });
 
   gulp.task('js', function () {
-    forEach(jsMap, function (srcFile, destFile) {
-      js({
+    var streams = [];
+    forEach(jsMap, function (destFile, srcFile) {
+      streams.push(js({
         src: idxTmpl('src/js/{0}', srcFile),
         dest: 'docs/js',
         name: idxTmpl('{0}', destFile)
-      });
+      }));
     });
+    return merge(streams);
   });
 
   gulp.task('css', function () {
-    forEach(cssMap, function (srcFile, destFile) {
-      css({
+    var streams = [];
+    forEach(cssMap, function (destFile, srcFile) {
+      streams.push(css({
         src: idxTmpl('src/less/{0}', srcFile),
         dest: 'docs/css',
         name: idxTmpl('{0}', destFile)
-      });
+      }));
     });
+    return merge(streams);
   });
 
   gulp.task('html', function () {
-    forEach(htmlMap, function (srcFile, destFile) {
-      html({
+    var streams = [];
+    forEach(htmlMap, function (destFile, srcFile) {
+      streams.push(html({
         src: idxTmpl('src/{0}', srcFile),
         dest: 'docs',
         name: idxTmpl('{0}', destFile)
-      });
+      }));
     });
+    return merge(streams);
   });
 
   gulp.task('img', function () {
-    img({
+    del.sync('docs/img/**/*');
+    return img({
       src: 'src/img/**/*',
       dest: 'docs/img'
     });
   });
 
   gulp.task('misc', function () {
-    gulp.src(miscSrc).pipe(gulp.dest('docs'));
+    return gulp.src(miscSrc).pipe(gulp.dest('docs'));
   });
 
   gulp.task('dist', distTask);
@@ -78,7 +88,7 @@ module.exports = function (options) {
 
   gulp.task('dev', ['build'], function () {
     browserSync.init({ server: 'docs' });
-    gulp.watch('src/less/*/**.less', ['css']);
+    gulp.watch('src/less/**/*.less', ['css']);
     gulp.watch('src/js/**/*.js', ['js']).on('change', browserSync.reload);
     gulp.watch('src/**/*.html', ['html']).on('change', browserSync.reload);
     gulp.watch('src/img/**/*', ['img']).on('change', browserSync.reload);

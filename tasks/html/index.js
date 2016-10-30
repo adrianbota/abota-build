@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const gulpIf = require('gulp-if');
 const rename = require('gulp-rename');
 const fileInclude = require('gulp-file-include');
 const htmlmin = require('gulp-htmlmin');
@@ -24,6 +23,6 @@ module.exports = function (config) {
       removeStyleLinkTypeAttributes: true,
       useShortDoctype: true
     }))
-    .pipe(gulpIf(config.name, rename(config.name)))
+    .pipe(rename(config.name))
     .pipe(gulp.dest(config.dest));
 };
