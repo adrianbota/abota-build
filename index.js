@@ -4,7 +4,7 @@ const js = require('./tasks/js');
 const css = require('./tasks/css');
 const html = require('./tasks/html');
 const img = require('./tasks/img');
-const assign = require('lodash.assign');
+const clone = require('lodash.clone');
 const forEach = require('lodash.foreach');
 const idxTmpl = require('index-template');
 const browserSync = require('browser-sync');
@@ -13,16 +13,11 @@ const merge = require('merge-stream');
 module.exports = function (options) {
   options = (options || {});
 
-  const jsMap = assign({ 'main.js': 'script.js' }, options.js);
-  const cssMap = assign({ 'main.less': 'style.css' }, options.css);
-  const htmlMap = assign({ 'index.html': 'index.html' }, options.html);
-  const distSrc = [].concat(options.dist || []);
-
-  const miscSrc = [
-    'src/robots.txt',
-    'src/favicon.*',
-    'src/CNAME'
-  ].concat(options.misc || []);
+  const jsCfg = clone(options.js || { 'main.js': 'script.js' });
+  const cssCfg = clone(options.css || { 'main.less': 'style.css' });
+  const htmlCfg = clone(options.html || { 'index.html': 'index.html' });
+  const miscSrc = clone(options.misc|| ['src/robots.txt', 'src/favicon.*', 'src/CNAME']);
+  const distSrc = clone(options.dist || []);
 
   const distTask = function () {
     return gulp.src(distSrc).pipe(gulp.dest('dist'));
@@ -37,7 +32,7 @@ module.exports = function (options) {
 
   gulp.task('js', function () {
     var streams = [];
-    forEach(jsMap, function (destFile, srcFile) {
+    forEach(jsCfg, function (destFile, srcFile) {
       streams.push(js({
         src: idxTmpl('src/js/{0}', srcFile),
         dest: 'docs/js',
@@ -49,7 +44,7 @@ module.exports = function (options) {
 
   gulp.task('css', function () {
     var streams = [];
-    forEach(cssMap, function (destFile, srcFile) {
+    forEach(cssCfg, function (destFile, srcFile) {
       streams.push(css({
         src: idxTmpl('src/less/{0}', srcFile),
         dest: 'docs/css',
@@ -61,7 +56,7 @@ module.exports = function (options) {
 
   gulp.task('html', function () {
     var streams = [];
-    forEach(htmlMap, function (destFile, srcFile) {
+    forEach(htmlCfg, function (destFile, srcFile) {
       streams.push(html({
         src: idxTmpl('src/{0}', srcFile),
         dest: 'docs',

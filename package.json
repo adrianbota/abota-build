@@ -1,6 +1,6 @@
 {
   "name": "abota-build",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "FE build system for personal projects",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "gulp-postcss": "^6.2.0",
     "gulp-rename": "^1.2.2",
     "index-template": "^1.1.1",
-    "lodash.assign": "^4.2.0",
+    "lodash.clone": "^4.5.0",
     "lodash.foreach": "^4.5.0",
     "merge-stream": "^1.0.0",
     "webpack-stream": "^3.2.0"
