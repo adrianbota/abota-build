@@ -16,7 +16,7 @@ module.exports = function (options) {
   const jsCfg = clone(options.js || { 'main.js': 'script.js' });
   const cssCfg = clone(options.css || { 'main.less': 'style.css' });
   const htmlCfg = clone(options.html || { 'index.html': 'index.html' });
-  const miscSrc = clone(options.misc|| ['src/robots.txt', 'src/favicon.*', 'src/CNAME']);
+  const miscSrc = clone(options.misc || ['.nojekyll', 'src/robots.txt', 'src/favicon.*', 'src/CNAME']);
   const distSrc = clone(options.dist || []);
 
   const distTask = function () {
