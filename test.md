@@ -1,5 +1,6 @@
 - modify html file
 - modify js file
 - modify less file
+- modify scss file
 - add/rename/delete image
 - modify misc file

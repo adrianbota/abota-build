@@ -9,6 +9,7 @@ const forEach = require('lodash.foreach');
 const idxTmpl = require('index-template');
 const browserSync = require('browser-sync');
 const merge = require('merge-stream');
+const fileExtension = require('file-extension');
 
 module.exports = function (options) {
   options = (options || {});
@@ -21,6 +22,11 @@ module.exports = function (options) {
 
   const distTask = function () {
     return gulp.src(distSrc).pipe(gulp.dest('dist'));
+  };
+
+  const guessCSSPreProc = function (fileName) {
+    var ext = fileExtension(fileName);
+    return  (ext === 'scss' || ext === 'sass') ? ext : 'less';
   };
 
   gulp.task('clean', function () {
@@ -45,11 +51,13 @@ module.exports = function (options) {
   gulp.task('css', function () {
     var streams = [];
     forEach(cssCfg, function (destFile, srcFile) {
+      var preProcName = guessCSSPreProc(srcFile);
+      var parentDir = preProcName;
       streams.push(css({
-        src: idxTmpl('src/less/{0}', srcFile),
+        src: idxTmpl('src/{0}/{1}', parentDir, srcFile),
         dest: 'docs/css',
         name: idxTmpl('{0}', destFile)
-      }));
+      }, preProcName));
     });
     return merge(streams);
   });
@@ -84,6 +92,8 @@ module.exports = function (options) {
   gulp.task('dev', ['build'], function () {
     browserSync.init({ server: 'docs' });
     gulp.watch('src/less/**/*.less', ['css']);
+    gulp.watch('src/scss/**/*.scss', ['css']);
+    gulp.watch('src/sass/**/*.sass', ['css']);
     gulp.watch('src/js/**/*.js', ['js']).on('change', browserSync.reload);
     gulp.watch('src/**/*.html', ['html']).on('change', browserSync.reload);
     gulp.watch('src/img/**/*', ['img']).on('change', browserSync.reload);
