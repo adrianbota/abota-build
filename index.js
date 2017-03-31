@@ -10,6 +10,7 @@ const idxTmpl = require('index-template');
 const browserSync = require('browser-sync');
 const merge = require('merge-stream');
 const fileExtension = require('file-extension');
+const run = require('gulp-run-command').default;
 
 module.exports = function (options) {
   options = (options || {});
@@ -101,5 +102,14 @@ module.exports = function (options) {
     gulp.watch(distSrc, ['dist']);
   });
 
-  gulp.task('default', ['build']);
+  gulp.task('test', function () {
+    return run('npm test');
+  });
+
+  gulp.task('tdd', function () {
+    gulp.watch('src/js/**/*.js', ['test']);
+    gulp.watch('test/**/*-spec.js', ['test']);
+  });
+
+  gulp.task('default', ['test', 'build']);
 };

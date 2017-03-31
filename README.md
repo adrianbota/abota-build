@@ -1,2 +1,2 @@
 # abota-build
-FE build system as npm dependency for personal projects
+FE build system as NPM dependency for personal projects
