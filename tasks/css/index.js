@@ -6,10 +6,12 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const browserSync = require('browser-sync');
+const plumber = require('gulp-plumber');
 
 module.exports = function (config, preProcName) {
   var preproc = (preProcName === 'scss' || preProcName === 'sass') ? sass : less;
 	return gulp.src(config.src)
+    .pipe(plumber())
 		.pipe(preproc())
 		.pipe(postcss([
 			autoprefixer({

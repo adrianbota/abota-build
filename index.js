@@ -4,13 +4,14 @@ const js = require('./tasks/js');
 const css = require('./tasks/css');
 const html = require('./tasks/html');
 const img = require('./tasks/img');
+const preTest = require('./tasks/pre-test');
+const test = require('./tasks/test');
 const clone = require('lodash.clone');
 const forEach = require('lodash.foreach');
 const idxTmpl = require('index-template');
 const browserSync = require('browser-sync');
 const merge = require('merge-stream');
 const fileExtension = require('file-extension');
-const run = require('gulp-run-command').default;
 
 module.exports = function (options) {
   options = (options || {});
@@ -102,11 +103,15 @@ module.exports = function (options) {
     gulp.watch(distSrc, ['dist']);
   });
 
-  gulp.task('test', function () {
-    return run('npm test');
+  gulp.task('pre-test', function () {
+    return preTest('src/js/**/*.js');
   });
 
-  gulp.task('tdd', function () {
+  gulp.task('test', ['pre-test'], function () {
+    return test('test');
+  });
+
+  gulp.task('tdd', ['test'], function () {
     gulp.watch('src/js/**/*.js', ['test']);
     gulp.watch('test/**/*-spec.js', ['test']);
   });

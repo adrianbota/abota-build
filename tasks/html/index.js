@@ -2,9 +2,11 @@ const gulp = require('gulp');
 const rename = require('gulp-rename');
 const fileInclude = require('gulp-file-include');
 const htmlmin = require('gulp-htmlmin');
+const plumber = require('gulp-plumber');
 
 module.exports = function (config) {
   return gulp.src(config.src)
+    .pipe(plumber())
     .pipe(fileInclude({
       indent: true
     }))
